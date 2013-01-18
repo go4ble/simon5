@@ -9,7 +9,7 @@
 
 int N_INOUT = 5;
 int LED_OUT[] = {0, 1, 2, 3, 4};
-int BUTTON_IN[] = {A0, A1, A2, A3, A4};
+int BUTTON_IN[] = {A4, A3, A2, A1, A0};
 int SPEAKER = 6;
 int TONES[] = {165, 139, 220, 82, 117};
 
