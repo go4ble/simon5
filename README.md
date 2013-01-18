@@ -1,4 +1,8 @@
 simon5
 ======
 
-Simon Says with 5 options
+Simon with 5 options
+
+Written for UW HCDE 231 Technical Instructions assignment
+
+Copyright 2013 Kyle Boone
