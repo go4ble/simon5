@@ -8,7 +8,7 @@
  */
 
 #define N_INOUT 5  // number of lights/buttons
-#define GAME_LEN 3  // number successful selections to win
+#define GAME_LEN 15  // number successful selections to win
 
 #define TIME_SHOW 500  // time to show light/buzzer
 #define TIME_BETWEEN 200  // time between each buzz
@@ -35,18 +35,48 @@ void setup() {
   for (int pos = 0; pos < GAME_LEN; pos++) {
     // determine next light to show
     game[pos] = random(N_INOUT);
+    
     // play current sequence
     for (int i = 0; i <= pos; i++) {
       digitalWrite(LED_OUT[game[i]], HIGH);
       tone(SPEAKER, TONES[game[i]], TIME_SHOW);
       delay(TIME_SHOW);
-      noTone(SPEAKER);
       digitalWrite(LED_OUT[game[i]], LOW);
       delay(TIME_BETWEEN);
     }
-    // delay(500);
+    
+    // player input
+    for (int i = 0; i <= pos; i++) {
+      if (getButton() != game[i])
+        gameLose();
+      digitalWrite(LED_OUT[game[i]], HIGH);
+      tone(SPEAKER, TONES[game[i]], TIME_SHOW);
+      delay(TIME_SHOW);
+      digitalWrite(LED_OUT[game[i]], LOW);
+    }
+    delay(500);
   }
-  // gameLose();
+  gameWin();
+}
+
+// get next button press from player
+// player has TIME_LOSE to press button before game is ended
+// if player presses more than one button, game is ended
+int getButton() {
+  int button = -1;
+  unsigned long start = millis();
+  while (millis() - start < TIME_LOSE) {
+    for (int i = 0; i < N_INOUT; i++)
+      if (!digitalRead(BUTTON_IN[i]))
+        if (button == -1)
+          button = i;
+        else
+          gameLose();
+    if (button != -1)
+      return button;
+  }
+  gameLose();
+  return button;
 }
 
 // flash some lights
@@ -63,9 +93,8 @@ void gameBegin() {
   digitalWrite(LED_OUT[0], HIGH);
   digitalWrite(LED_OUT[4], HIGH);
   delay(500);
-  for (int i = 0; i < N_INOUT; i++) {
+  for (int i = 0; i < N_INOUT; i++)
     digitalWrite(LED_OUT[i], LOW);
-  }
   delay(500);
 }
 
@@ -74,9 +103,8 @@ void gameBegin() {
 // make player feel bad for losing
 void gameLose() {
   tone(SPEAKER, 49, 250);
-  for (int i = 0; i < N_INOUT; i++) {
+  for (int i = 0; i < N_INOUT; i++)
     digitalWrite(LED_OUT[i], HIGH);
-  }
   delay(300);
   tone(SPEAKER, 44, 250);
   digitalWrite(LED_OUT[0], LOW);
@@ -87,6 +115,22 @@ void gameLose() {
   digitalWrite(LED_OUT[3], LOW);
   delay(250);
   digitalWrite(LED_OUT[2], LOW);
+  while (true) {}
+}
+
+// indicate to player that they have won
+void gameWin() {
+  for (int k = 1; k <= 5; k++) {
+    tone(SPEAKER, 500, 250);
+    for (int i = 0; i < N_INOUT; i++)
+      digitalWrite(LED_OUT[i], HIGH);
+    delay(250);
+    for (int i = 0; i < N_INOUT; i++)
+      digitalWrite(LED_OUT[i], LOW);
+    delay(50);
+  }
+  
+  while (true) {}
 }
 
 // loop isn't used
